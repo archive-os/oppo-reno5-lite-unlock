@@ -17,6 +17,19 @@ Bu rehber tüm Reno5 modellerine veya başka firmware sürümlerine uyumluluk ga
 
 Bu depoda cihazımızdan alınmış firmware, preloader, BOOT1/BOOT2 veya kişisel yedek bulunmaz. Her kullanıcı kendi cihazının yedeğini alıp kendisi patchlemelidir. `tools/` yalnız upstream patch kodunu ve lisansını içerir. `SHA256SUMS` araç dosyalarının bütünlüğünü kontrol eder.
 
+## Başlamadan önce ROM yedeği alın
+
+**Tam ROM/bölüm yedeği ve ayrı UFS BOOT1/BOOT2 yedekleri olmadan başlamayın. Fotoğraf ve kişisel dosyaları da başka diske kopyalayın.** NVRAM/NVDATA gibi kalibrasyon bölümleri kendi cihazınızın kurtarılması için korunmalı, internette paylaşılmamalıdır. Yedek kurtarma garantisi değildir.
+
+MTKClient GUI'de bölüm okuma ekranından tüm bölümleri kendi `backup/` klasörünüze okuyun. CLI karşılığı (MTKClient klasöründe):
+
+```bash
+mkdir -p backup/partitions
+./.venv/bin/python mtk.py rl backup/partitions
+```
+
+Başarılı okumayı ve dosyaları kontrol edin; hata varsa unlock aşamasına geçmeyin. Bu komut ayrı UFS boot alanlarının yerine geçmez; aşağıdaki BOOT1/BOOT2 okuma adımlarını da uygulayın. `Format All` kullanmayın.
+
 ## Gerekenler
 
 - Kendi CPH2205 cihazınız; bu deneyim F.72 / Android 13 içindir.
@@ -26,6 +39,27 @@ Bu depoda cihazımızdan alınmış firmware, preloader, BOOT1/BOOT2 veya kişis
 
 Komutlardaki `python mtk.py` için MTKClient'in kurulu olduğu klasörde, gerekli bağımlılıkları içeren Python ortamını kullanın (örneğin `./.venv/bin/python mtk.py`). Bu rehberde `backup/` klasörü MTKClient klasörünün içindedir. ADB ve fastboot komutları bilgisayar terminalinde çalıştırılır.
 
+## Depodaki gerçek GUI ve CLI aracı
+
+[MTKClient 2.1.4 kaynak paketi](tools/mtkclient-2.1.4-source.zip) GUI (`mtk_gui.py`), CLI (`mtk.py`), kütüphaneler ve upstream loader/payload dosyalarını içerir. Bizim telefondan alınmış dosya içermez. Kaynak ve GPL lisansı için [atıf](tools/MTKCLIENT-UPSTREAM.md).
+
+GitHub'dan bu rehberi ZIP olarak indirip açtıktan sonra rehber klasöründe:
+
+```bash
+sudo apt install unzip git build-essential python3-venv python3-dev libssl-dev libusb-1.0-0 libxcb-cursor0 adb fastboot
+sha256sum -c SHA256SUMS
+unzip tools/mtkclient-2.1.4-source.zip -d mtkclient
+cd mtkclient
+python3 -m venv .venv
+./.venv/bin/python -m pip install . keystone-engine capstone unicorn
+sudo cp Setup/Linux/52-mtk.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules
+sudo udevadm trigger --subsystem-match=usb
+./.venv/bin/python mtk_gui.py
+```
+
+CLI yardımını telefona yazmadan görmek için `./.venv/bin/python mtk.py --help` kullanın. USB izin sorunu varsa [resmî kurulum yönergesini](https://github.com/bkerler/mtkclient/blob/main/README-INSTALL.md) izleyin.
+
 ## MTKClient GUI kurulumu ve açılması (Ubuntu/Linux)
 
 ```bash
@@ -34,7 +68,6 @@ git clone https://github.com/bkerler/mtkclient.git
 cd mtkclient
 git checkout cd25cf9c1ff6d36e82697ac2c798e69e9cfb78c3
 python3 -m venv .venv
-./.venv/bin/python -m pip install -r requirements.txt
 ./.venv/bin/python -m pip install . keystone-engine capstone unicorn
 sudo cp Setup/Linux/52-mtk.rules /etc/udev/rules.d/
 sudo udevadm control --reload-rules

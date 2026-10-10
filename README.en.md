@@ -43,3 +43,7 @@ python3 tools/path_preloader.py /path/to/your-own-ufs-boot1-original.bin boot1-p
 Output is `preloader_path/boot1-patched.bin`; this command does not flash a phone. Verify bundled tool files with `sha256sum -c SHA256SUMS`. Never feed the small extracted RAW preloader to this tool.
 
 Original documentation is licensed under [CC BY 4.0](LICENSE); third-party tools retain their own licenses. No firmware images are distributed.
+
+## Back up first and bundled tools
+
+**Back up the full ROM/partitions, both separate UFS boot areas, and personal data before starting. Keep calibration backups private. Backups do not guarantee recovery.** The actual GUI/CLI source package is [bundled here](tools/mtkclient-2.1.4-source.zip), with [upstream attribution](tools/MTKCLIENT-UPSTREAM.md). Setup, GUI launch, CLI backup and patch commands are in the [full guide](README.md).
