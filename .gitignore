@@ -1,0 +1,15 @@
+*.bin
+*.img
+*.ofp
+*.ozip
+*.log
+*.auth
+backup/
+patch-tool/
+preloader_path/
+.state
+hwparam.json
+__pycache__/
+.venv/
+
+original-images/
